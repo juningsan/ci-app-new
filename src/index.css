@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-main: 'Noto Serif SC', serif;
+  --bg-light: #fdfdf5;
+  --bg-dark: #1a1a1a;
+  --text-light: #213547;
+  --text-dark: #f4f4f4;
+}
+
+body {
+  @apply bg-[var(--bg-light)] text-[var(--text-light)] font-[var(--font-main)] min-h-screen m-0 leading-relaxed antialiased;
+}
+
+.dark body {
+  @apply bg-[var(--bg-dark)] text-[var(--text-dark)];
+}
+
+h1, h2, h3 {
+  @apply font-bold tracking-wide mb-4;
+}
+
+a {
+  @apply text-blue-600 hover:underline;
+}
+
+button {
+  @apply px-4 py-2 rounded bg-gray-800 text-white hover:bg-gray-700;
+}
