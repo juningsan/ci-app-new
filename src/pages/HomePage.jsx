@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 export default function HomePage() {
   return (
     <main className="bg-[#fdfdf5] text-gray-800 font-noto px-4 py-8 max-w-4xl mx-auto">
@@ -50,9 +51,9 @@ export default function HomePage() {
       {/* 填词助手入口 */}
       <section className="mb-16 text-center">
         <h2 className="text-xl font-semibold mb-2">✍️ 想试试自己填一首词？</h2>
-        <a href="/tools" className="inline-block mt-2 px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition">
+        <Link to="/tools" className="inline-block mt-2 px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition">
           打开填词助手
-        </a>
+        </Link>
       </section>
 
       {/* 页脚 */}
