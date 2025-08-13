@@ -1,11 +1,32 @@
 import { useState } from "react";
 import { useEffect } from "react";
+import { Link } from 'react-router-dom'
 
+import Header from "./Header";  
 import Contentlist from "./contentlist";
 import yunlist from "./pingshui";
 
+
+function CiPaiSelector({ ciPais, currentCiPai, setCurrentCiPai }) {
+    function onSelect(val) {
+        setCurrentCiPai(val);
+    };
+    return (
+        <div className="px-5 mt-3 h-[9rem] overflow-y-auto">
+        <ul className="grid grid-cols-4 gap-4">
+            {ciPais.map((val, key) => (
+                <li key={key} className="text-center bg-white shadow rounded px-4 py-3 hover:bg-gray-100 text-gray-800 hover:text-gray-600 cursor-pointer" onClick={() => onSelect(val)}>
+                        {val}                  
+                </li>
+            ))}
+        </ul>   
+        </div>      
+    )
+
+}
+
 export default function CiAssist() {
-    const ciPais = ['浣溪沙', '菩萨蛮'];
+    const ciPais = ['浣溪沙', '暗香', '菩萨蛮', '蝶恋花', '如梦令', '忆江南', '清平乐', '虞美人', '临江仙', '西江月', '水调歌头'];
     const [currentCiPai, setCurrentCiPai] = useState('浣溪沙');
     const currentContent = Contentlist[currentCiPai] || '';
     const [inputs, setInputs] = useState({});
@@ -71,7 +92,6 @@ export default function CiAssist() {
                 yunFlagLine.push(false); // 普通字
             }
         }
-        console.log('当前韵脚标记:', yunFlagLine);
 
         const yunZiLine = [];
         for (let i = 0; i < yunFlagLine.length; i++) {
@@ -137,24 +157,28 @@ export default function CiAssist() {
                 }
             }
         }
+        if(output === false) {
+            let count = 0;
+            for (const x in yunlist) {
+                if(!yunlist[x].some(obj => obj.word.includes(word) )){
+                    count++;
+                    }
+            }
+            if(count === 5) output = true; 
+        }
+    
         return output;
     };
 
     return (
-        <div className="min-h-screen">
-            <div className="flex justify-center font-noto text-xl">
+        <>
+        <Header />
+        <div className="max-w-4xl mx-auto">
+            <div className="pt-20 flex justify-center font-noto text-xl">
                 选择词牌以开始
             </div>
-            <ul className="flex justify-center gap-1 pl-8">
-                {ciPais.map((val, key) => (
-                    <li key={key} className="bg-white shadow rounded px-4 py-3 hover:bg-gray-100">
-                        <a className="text-gray-800 hover:text-gray-600" onClick={() => setCurrentCiPai(val)}>
-                            {val}
-                        </a>
-                    </li>
-                ))}
-            </ul>
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <CiPaiSelector ciPais={ciPais} currentCiPai={currentCiPai} setCurrentCiPai={setCurrentCiPai} />
+            <div className="px-4 py-8">
                 <h2 className="text-2xl font-semibold mb-4">当前词牌：{currentCiPai}</h2>
                 {
                     typeof currentContent === 'string' && currentContent.trim() !== '' ? (
@@ -216,9 +240,10 @@ export default function CiAssist() {
                     )
                 }
             </div>
-            <footer className="text-center text-sm text-gray-500 border-t pt-6">
+            <footer className="w-screen fixed bottom-7 left-1/2 transform -translate-x-1/2 text-center text-sm text-gray-500 pt-6">
                 © 2025 Eliot Hongtuo · 以词为舟，泛古今
             </footer>
         </div>
+        </>
     )
 }

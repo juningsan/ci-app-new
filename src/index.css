@@ -23,7 +23,7 @@ h1, h2, h3 {
 }
 
 a {
-  @apply text-blue-600 hover:underline;
+  @apply text-blue-600 hover:no-underline;
 }
 
 button {
