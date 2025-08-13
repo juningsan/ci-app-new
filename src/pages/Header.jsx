@@ -5,7 +5,6 @@ import './styles/Header.css';
 export default function Header() {
     const location = useLocation();
     const path = location.pathname.split('/')[1]; 
-    console.log('Current path:', path);
     return (
         <>
         <div className="w-full fixed left-1/2 -translate-x-1/2 z-100 wave-container">
