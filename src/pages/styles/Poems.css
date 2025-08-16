@@ -23,13 +23,16 @@
   width: var(--w);
   height: var(--h);
   top: 25%;
-  left: calc(50% - (var(--w) / 2) - 2.5px);
   z-index: 2;
+  left: calc(50% - (var(--w) / 2) - 2.5px);
   transform-style: preserve-3d;
   transform: perspective(var(--perspective)) rotateX(var(--rotateX)) rotateY(0);
   transition: transform 0.6s cubic-bezier(.4,2,.6,1);
   animation: rotating 30s linear infinite;
 }
+
+
+
 
 @keyframes rotating {
   from {

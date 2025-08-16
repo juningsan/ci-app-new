@@ -4,43 +4,49 @@ import Header from "./Header.jsx";
 import TextFall from "./TextFall.jsx";
 import "./styles/Poems.css"
 import "./styles/TextFall.css";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export default function Poems() {
-    const poemCards = [
-        { color: "142, 249, 252", },
-        { color: "142, 252, 204", },
-        { color: "142, 252, 157", },
-        { color: "215, 252, 142", },
-        { color: "252, 252, 142", },
-        { color: "252, 208, 142", },
-        { color: "252, 142, 142", },
-        { color: "252, 142, 239", },
-        { color: "204, 142, 252", },
-        { color: "142, 202, 252", }
+    const colors = [
+        "142, 249, 252",
+        "142, 252, 204",
+        "142, 252, 157",
+        "215, 252, 142",
+        "252, 252, 142",
+        "252, 208, 142",
+        "252, 142, 142",
+        "252, 142, 239",
+        "204, 142, 252",
+        "142, 202, 252"
     ];
-    if (poems && Object.keys(poems).length > 0) {
-        Object.keys(poems).forEach((key, index) => {
-            if (index >= poemCards.length) return;
-            poemCards[index].title = key;
-            poemCards[index].content = poems[key];
-        });
-    }
+    const poemCards = poems && Object.keys(poems).length > 0 ? Object.keys(poems).map((key, index) => ({
+        title: key,
+        content: poems[key],
+        color: colors[index % colors.length]
+    })) : [];
+
 
     const [hovered, setHovered] = useState(null);
     const [current, setCurrent] = useState(0); // 当前卡片索引
-    const total = 10; // 卡片总数
+    const total = poemCards.length > 10 ? poemCards.length : 10; // 卡片总数
+    // const [cycle, setCycle] = useState(0);
     // 切换到下一个卡片
-    const next = () => setCurrent((prev) => (prev + 1) % total);
+    // const next = () => setCurrent((prev) => (prev + 1) % total);
+    const next = () => setCurrent((prev) => (prev + 1));
     // 切换到上一个卡片
-    const prev = () => setCurrent((prev) => (prev - 1 + total) % total);
+    // const prev = () => setCurrent((prev) => (prev - 1 + total) % total);
+    const prev = () => setCurrent((prev) => (prev - 1));
+
+    useEffect(() => {
+        console.log('Current card index:', current,hovered);
+    }, [current, hovered]);
 
     const start = useRef({ x: 0, y: 0, locked: null });
     const dragging = useRef(false);
     const moveEnough = useRef(false);
-    const downTime = useRef(0);
-    const [dir, setDir] = useState('-');
-    const THRESHOLD = 1; // 阈值,过滤抖动
+    const dir = useRef('-');
+    const activeIndex = useRef(null);
+    const THRESHOLD = 8; // 阈值,过滤抖动
 
     const getDirection = (dx, dy) => {
         if (Math.abs(dx) < THRESHOLD && Math.abs(dy) < THRESHOLD) return null;
@@ -52,17 +58,21 @@ export default function Poems() {
         }
     }
 
-    const onPointerDown = (e) => {
-        // e.currentTarget.setPointerCapture?.(e.pointerId);
-        e.currentTarget.setPointerCapture?.(e.pointerId);
+    const onPointerDown = (e, index) => {
+        moveEnough.current = false;
+        try {
+            if (e.currentTarget.setPointerCapture) {
+                e.currentTarget.setPointerCapture(e.pointerId);
+            }
+        } catch (err) {
+            console.warn('setPointerCapture failed:', err);
+        }
         // window.addEventListener('pointermove', onPointerMove);
         // window.addEventListener('pointerup', onPointerUp);
         start.current = { x: e.clientX, y: e.clientY, locked: null };
         dragging.current = true;
-        downTime.current = Date.now();
-        setDir('-');
-
-        
+        dir.current = '-';
+        activeIndex.current = index;
     }
 
     const onPointerMove = (e) => {
@@ -72,33 +82,35 @@ export default function Poems() {
 
         const direction = getDirection(dx, dy);
         if (direction) {
-            setDir(direction);
+            dir.current = direction;
         }
 
         if (Math.abs(dx) > THRESHOLD || Math.abs(dy) > THRESHOLD) {
             moveEnough.current = true;
         }
 
-        console.log('Direction:', direction, 'dx:', dx, 'dy:', dy);
     }
 
     const onPointerUp = () => {
         if (!dragging.current) return;
         if (moveEnough.current) {
-            console.log(dir,current);
-            if (dir === 'left') {
+            if (dir.current === 'left') {
                 next();
-            }
-            else if (dir === 'right') {
+            } else if (dir.current === 'right') {
                 prev();
             }
+        } else {
+            // 视为点击：在松手时才执行选择/旋转，避免按下时布局变化打断 click 合成
+            if (activeIndex.current != null) {
+                gotoCard(activeIndex.current);
+            }
         }
-        // window.removeEventListener('pointermove', onPointerMove);
-        // window.removeEventListener('pointerup', onPointerUp);  
 
         dragging.current = false;
         start.current = { x: 0, y: 0, locked: null };
-        setDir('-');
+        dir.current = '-';
+        moveEnough.current = false;
+        activeIndex.current = null;
     };
 
 
@@ -121,32 +133,44 @@ export default function Poems() {
             //   void inner.offsetWidth;
             //   inner.style.animation = ''; // 恢复动画
         }
-        setCurrent(index % total);
+        
+                // 使用函数式更新，避免闭包里的 current 过期；并将取模归一到 [0, total)
+        setCurrent((prev) => {
+            if (!Number.isFinite(total) || total <= 0) return prev;
+            const currentMod = ((prev % total) + total) % total; // 始终非负
+            let offset = index - currentMod;
+            if (offset > total / 2) offset -= total;    // 走最短路径（顺时针）
+            if (offset < -total / 2) offset += total;   // 走最短路径（逆时针）
+            return prev + offset;
+        });
     };
 
     return (
         <>
             <Header />
             {/* From Uiverse.io by ilkhoeri */}
-            <div className="wrapper">
-                <div className="inner" style={{ "--quantity": total, transform: `perspective(1000px) rotateX(-15deg) rotateY(-${current * 36}deg)` }}>
+            <div className="wrapper" style={{}}>
+                <div className="inner" style={{ "--quantity": total, transform: `perspective(1000px) rotateX(-15deg) rotateY(${-current * 360 / total}deg)` }}>
                     {/* 生成卡片 */}
                     {poemCards.map((poem, index) => (
-                        index < 10 && (
+                        (
                             <div
                                 className="card"
+                                
                                 key={index}
                                 style={{ "--index": index, "--color-card": poem.color, touchAction: 'none' }}
-                                onMouseEnter={() => { handleSelect(); setHovered(index); setCurrent(index); }}
+                                onMouseEnter={() => { handleSelect(); setHovered(index); }}
                                 onMouseLeave={() => { handleDeselect(); setHovered(null); }}
-                                onPointerDown={(e) => onPointerDown(e)}
+                                onPointerDown={(e) => onPointerDown(e, index)}
                                 onPointerMove={(e) => onPointerMove(e)}
                                 onPointerUp={() => onPointerUp()}
                                 onPointerCancel={() => onPointerUp()}
                             >
                                 <Link to={`/poems/${encodeURIComponent(poem.title)}`} className="text-blue-500"
                                     onClick={(e) => {
+                                        
                                         if (moveEnough.current) {
+                                            
                                             e.preventDefault();
                                             moveEnough.current = false; // 重置移动状态
                                         }
@@ -177,9 +201,9 @@ export default function Poems() {
                 <ul className=" flex justify-center items-center space-x-4">
                     {poems && Object.keys(poems).length > 0 ? (
                         Object.keys(poems).map((x, idx) => (
-                            <li key={idx}>
+                            <li key={idx} className="w-[10px]">
                                 <Link to={`/poems/${encodeURIComponent(x)}`} className="text-blue-500 hover:no-underline" onMouseEnter={() => gotoCard(idx)}>
-                                    {x}
+                                   {x}
                                 </Link>
                             </li>
                         ))
