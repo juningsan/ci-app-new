@@ -66,6 +66,7 @@ export default function Poems() {
                     }
                     count++;
                     setCardOffset((prev) => prev + count);
+                    // setCardOffset(count);
                 }
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, count);
@@ -87,7 +88,8 @@ export default function Poems() {
 
                     }
                     count++;
-                    setCardOffset((prev) => prev + count);
+                    setCardOffset((prev) => prev - count);
+                    // setCardOffset(count);
                 }
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, -count);
@@ -116,6 +118,7 @@ export default function Poems() {
                     count++;
                 }
                 setCardOffset((prev) => prev + count);
+                // setCardOffset(count);
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, count);
                     console.log(currentCards);
@@ -129,14 +132,14 @@ export default function Poems() {
                 while (Math.abs(currentIdx / total) > 0.7) {
                     if (currentIdx > 0) {
                         currentIdx--;
-
+                        
                     }
                     else {
                         currentIdx++;
-
                     }
                     count++;
-                    setCardOffset((prev) => prev + count);
+                    setCardOffset((prev) => prev - count);
+                    // setCardOffset(count);
                 }
                 setCardOffset((prev) => prev + count);
                 if (currentIdx !== current) {
@@ -249,6 +252,7 @@ export default function Poems() {
         }
         let idx = index;
 
+        // if (Math.abs(current%total / total) > 0.2 && Math.abs(current%total / total) < 0.3)
         idx = index - cardOffset < 0 ? index + cardOffset + total : index + cardOffset;
 
         console.log('gotoCard: ', index, cardOffset);
