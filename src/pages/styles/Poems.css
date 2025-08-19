@@ -23,6 +23,7 @@
   width: var(--w);
   height: var(--h);
   top: 25%;
+  background-color: aquamarine;
   z-index: 2;
   left: calc(50% - (var(--w) / 2) - 2.5px);
   transform-style: preserve-3d;
