@@ -89,7 +89,7 @@ export default function Poems() {
                     }
                     count++;
                     setCardOffset((prev) => prev - count);
-                    // setCardOffset(count);
+                    // setCardOffset(-count);
                 }
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, -count);
@@ -132,16 +132,16 @@ export default function Poems() {
                 while (Math.abs(currentIdx / total) > 0.7) {
                     if (currentIdx > 0) {
                         currentIdx--;
-                        
+
                     }
                     else {
                         currentIdx++;
                     }
                     count++;
                     setCardOffset((prev) => prev - count);
-                    // setCardOffset(count);
+                    // setCardOffset(-count);
                 }
-                setCardOffset((prev) => prev + count);
+                // setCardOffset((prev) => prev + count);
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, -count);
                     console.log(currentCards);
@@ -153,10 +153,30 @@ export default function Poems() {
         }
     }, [current, cardOffset, poemCards]);
 
+    const gotoCard = (index) => {
+        const inner = document.querySelector('.inner');
+        if (inner) {
+            inner.style.animation = 'none'; // 移除动画
+            // 触发重绘
+            //   void inner.offsetWidth;
+            //   inner.style.animation = ''; // 恢复动画
+        }
+        console.log('index', index, 'cardOffset', cardOffset);
+        setCurrent((prev) => {
+            let idx = index + cardOffset;
+            const currentMod = ((prev % total) + total) % total;
+            let offset = idx - prev;
+            if (offset > total / 2) offset -= total;    // 走最短路径（顺时针）
+            if (offset < -total / 2) offset += total;   // 走最短路径（逆时针）
+            console.log('offset', offset);
+            return prev + offset;
+        });
+    };
+
     useEffect(() => {
-        console.log(prevCurrent.current, current)
+        console.log('prev', prevCurrent.current, 'current', current, 'offset', cardOffset)
         prevCurrent.current = current;
-    }, [current]);
+    }, [current, cardOffset]);
 
     const start = useRef({ x: 0, y: 0, locked: null });
     const dragging = useRef(false);
@@ -219,7 +239,7 @@ export default function Poems() {
         } else {
             // 视为点击：在松手时才执行选择/旋转，避免按下时布局变化打断 click 合成
             if (activeIndex.current != null) {
-                gotoCard(activeIndex.current - cardOffset);
+                gotoCard(activeIndex.current);
             }
         }
 
@@ -239,33 +259,6 @@ export default function Poems() {
     const handleDeselect = () => {
         const inner = document.querySelector('.inner');
         if (inner) inner.style.animationPlayState = 'running';
-    };
-
-
-    const gotoCard = (index) => {
-        const inner = document.querySelector('.inner');
-        if (inner) {
-            inner.style.animation = 'none'; // 移除动画
-            // 触发重绘
-            //   void inner.offsetWidth;
-            //   inner.style.animation = ''; // 恢复动画
-        }
-        let idx = index;
-
-        // if (Math.abs(current%total / total) > 0.2 && Math.abs(current%total / total) < 0.3)
-        idx = index - cardOffset < 0 ? index + cardOffset + total : index + cardOffset;
-
-        console.log('gotoCard: ', index, cardOffset);
-        setCurrent((prev) => {
-            if (!Number.isFinite(total) || total <= 0) return prev;
-            if (!prev) return index;
-            const currentMod = ((prev % total) + total) % total; // 始终非负
-            let offset = idx - currentMod;
-            if (offset > total / 2) offset -= total;    // 走最短路径（顺时针）
-            if (offset < -total / 2) offset += total;   // 走最短路径（逆时针）
-            console.log(prev + offset);
-            return prev + offset;
-        });
     };
 
     return (
