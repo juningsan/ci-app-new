@@ -24,42 +24,44 @@ export default function HomePage() {
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
-  // 1) Try local cache first
-  const cached = localStorage.getItem('bingWallpapers');
-  const staleAt = localStorage.getItem('bingWallpapers:staleAt');
-  const now = Date.now();
+        // 1) Try local cache first
+        const cached = localStorage.getItem('bingWallpapers');
+        const staleAt = localStorage.getItem('bingWallpapers:staleAt');
+        const now = Date.now();
 
-  if (cached && staleAt && now < Number(staleAt)) {
-    const urls = JSON.parse(cached);
-    setImgUrl(urls);
-    // Warm the browser cache in the background
-    urls.forEach(u => { const i = new Image(); i.src = u; });
-    return; // skip network fetch
-  }
+        if (cached && staleAt && now < Number(staleAt)) {
+            const urls = JSON.parse(cached);
+            setImgUrl(urls);
+            // Warm the browser cache in the background
+            urls.forEach(u => { const i = new Image(); i.src = u; });
+            return; // skip network fetch
+        }
 
-  // 2) Fetch fresh, then persist
-  fetch('http://localhost:3001/api/bing-image')
-    .then(res => res.json())
-    .then(data => {
-      const urls = data.images.map(img => "https://www.bing.com" + img.url);
-      setImgUrl(urls);
+        // 2) Fetch fresh, then persist
+        fetch('http://localhost:3001/api/bing-image')
+            .then(res => res.json())
+            .then(data => {
+                const urls = data.images.map(img => "https://www.bing.com" + img.url);
+                setImgUrl(urls);
 
-      // Save for later sessions (e.g. valid for 24h)
-      localStorage.setItem('bingWallpapers', JSON.stringify(urls));
-      localStorage.setItem('bingWallpapers:staleAt', String(now + 24*60*60*1000));
+                // Save for later sessions (e.g. valid for 24h)
+                localStorage.setItem('bingWallpapers', JSON.stringify(urls));
+                localStorage.setItem('bingWallpapers:staleAt', String(now + 24 * 60 * 60 * 1000));
 
-      // Warm the cache
-      urls.forEach(u => { const i = new Image(); i.src = u; });
-    })
-    .catch(err => {
-      // Fallback to local/public assets (these will be cacheable by the browser too)
-      const urls = ['/assets/img1.jpg', '/assets/img2.jpg', '/assets/img3.jpg'];
-      setImgUrl(urls);
-    window.__bingWallpapers = urls;
-      urls.forEach(u => { const i = new Image(); i.src = u; });
-      console.error('壁纸加载失败', err);
-    });
-}, []);
+                // Warm the cache
+                urls.forEach(u => { const i = new Image(); i.src = u; });
+            })
+            .catch(err => {
+                // Fallback to local/public assets (these will be cacheable by the browser too)
+                const urls = ['/assets/img1.jpg', '/assets/img2.jpg', '/assets/img3.jpg'];
+                setImgUrl(urls);
+                localStorage.setItem('bingWallpapers', JSON.stringify(urls));
+                localStorage.setItem('bingWallpapers:staleAt', String(now + 24 * 60 * 60 * 1000));
+                window.__bingWallpapers = urls;
+                urls.forEach(u => { const i = new Image(); i.src = u; });
+                console.error('壁纸加载失败', err);
+            });
+    }, []);
 
     // useEffect(() => {
     //     fetch('http://localhost:3001/api/bing-image')
@@ -158,11 +160,11 @@ export default function HomePage() {
                             {
                                 Object.keys(ciCollection).map((collection, idx) => (
                                     idx < 9 ?
-                                    <Link key={idx} to={`/poems/${collection}`}>
-                                        
-                                        <Card text={collection} width={'250px'} height={'55px'} />
-                                    </Link>
-                                    : null
+                                        <Link key={idx} to={`/poems/${collection}`} className='mx-auto'>
+
+                                            <Card text={collection} width={'250px'} height={'55px'} />
+                                        </Link>
+                                        : null
                                 ))
                             }
                         </div>

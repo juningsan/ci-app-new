@@ -369,9 +369,6 @@ export default function Poems() {
                         <li>暂无词集数据</li>
                     )}
                 </ul>
-                
-                
-                <Card text = {'Hello'} />
             </div>
         </>
     );
