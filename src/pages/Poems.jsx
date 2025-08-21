@@ -1,10 +1,15 @@
-import { Link } from "react-router-dom";
-import poems from "./poems.js";
-import Header from "./Header.jsx";
-import TextFall from "./TextFall.jsx";
+import { Link, Navigate } from "react-router-dom";
+import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+import poems from "./poems.js"
+import Header from "./Header.jsx"
+import TextFall from "./TextFall.jsx"
+import Card from "./Card.jsx"
 import "./styles/Poems.css"
 import "./styles/TextFall.css";
-import { useRef, useState, useEffect } from "react";
+
+
 
 export default function Poems() {
     const colors = [
@@ -25,20 +30,40 @@ export default function Poems() {
         color: colors[index % colors.length]
     })) : []);
     const [cardOffset, setCardOffset] = useState(0);
-
+    const navigate = useNavigate();
 
     const [hovered, setHovered] = useState(null);
     const [current, setCurrent] = useState(null); // 当前卡片索引
     const prevCurrent = useRef(current);
     const total = poemCards.length > 10 ? poemCards.length : 10; // 卡片总数
-    // const [cycle, setCycle] = useState(0);
-    // 切换到下一个卡片
-    // const next = () => setCurrent((prev) => (prev + 1) % total);
-    const next = () => setCurrent((prev) => (prev + 1));
+    // 切换到下一张卡片
+    const next = () => {
+        const inner = document.querySelector('.inner');
+        if (inner) {
+            inner.style.animation = 'none'; // 移除动画
+            // 触发重绘
+            //   void inner.offsetWidth;
+            //   inner.style.animation = ''; // 恢复动画
+        }
+        setCurrent((prev) => {
+            if (prev === null) return 0;
+            return (prev + 1)
+        });
+    }
     // 切换到上一个卡片
-    // const prev = () => setCurrent((prev) => (prev - 1 + total) % total);
-    const prev = () => setCurrent((prev) => (prev - 1));
-
+    const prev = () => {
+        const inner = document.querySelector('.inner');
+        if (inner) {
+            inner.style.animation = 'none'; // 移除动画
+            // 触发重绘
+            //   void inner.offsetWidth;
+            //   inner.style.animation = ''; // 恢复动画
+        }
+        setCurrent((prev) => {
+            if (prev === null) return 0;
+            return (prev - 1)
+        });
+    }
 
     function rotateArray(arr, count) {
         if (!Array.isArray(arr) || arr.length === 0) return arr;
@@ -66,13 +91,11 @@ export default function Poems() {
                     }
                     count++;
                     setCardOffset((prev) => prev + count);
-                    // setCardOffset(count);
                 }
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, count);
                     console.log(currentCards);
                     setPoemCards(currentCards);
-
                     setCurrent((prev) => prev + count);
                 }
             }
@@ -81,15 +104,12 @@ export default function Poems() {
                 while (Math.abs(currentIdx / total) > 0.2) {
                     if (currentIdx > 0) {
                         currentIdx--;
-
                     }
                     else {
                         currentIdx++;
-
                     }
                     count++;
                     setCardOffset((prev) => prev - count);
-                    // setCardOffset(-count);
                 }
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, -count);
@@ -123,7 +143,6 @@ export default function Poems() {
                     let currentCards = rotateArray(poemCards, count);
                     console.log(currentCards);
                     setPoemCards(currentCards);
-
                     setCurrent((prev) => prev + count);
                 }
             }
@@ -132,22 +151,18 @@ export default function Poems() {
                 while (Math.abs(currentIdx / total) > 0.7) {
                     if (currentIdx > 0) {
                         currentIdx--;
-
                     }
                     else {
                         currentIdx++;
                     }
                     count++;
                     setCardOffset((prev) => prev - count);
-                    // setCardOffset(-count);
                 }
-                // setCardOffset((prev) => prev + count);
                 if (currentIdx !== current) {
                     let currentCards = rotateArray(poemCards, -count);
                     console.log(currentCards);
                     setPoemCards(currentCards);
                     setCurrent((prev) => prev - count);
-
                 }
             }
         }
@@ -164,7 +179,6 @@ export default function Poems() {
         console.log('index', index, 'cardOffset', cardOffset);
         setCurrent((prev) => {
             let idx = index + cardOffset;
-            const currentMod = ((prev % total) + total) % total;
             let offset = idx - prev;
             if (offset > total / 2) offset -= total;    // 走最短路径（顺时针）
             if (offset < -total / 2) offset += total;   // 走最短路径（逆时针）
@@ -183,7 +197,7 @@ export default function Poems() {
     const moveEnough = useRef(false);
     const dir = useRef('-');
     const activeIndex = useRef(null);
-    const THRESHOLD = 8; // 阈值,过滤抖动
+    const THRESHOLD = 2; // 阈值,过滤抖动
 
     const getDirection = (dx, dy) => {
         if (Math.abs(dx) < THRESHOLD && Math.abs(dy) < THRESHOLD) return null;
@@ -196,6 +210,7 @@ export default function Poems() {
     }
 
     const onPointerDown = (e, index) => {
+
         moveEnough.current = false;
         try {
             if (e.currentTarget.setPointerCapture) {
@@ -204,8 +219,6 @@ export default function Poems() {
         } catch (err) {
             console.warn('setPointerCapture failed:', err);
         }
-        // window.addEventListener('pointermove', onPointerMove);
-        // window.addEventListener('pointerup', onPointerUp);
         start.current = { x: e.clientX, y: e.clientY, locked: null };
         dragging.current = true;
         dir.current = '-';
@@ -228,8 +241,13 @@ export default function Poems() {
 
     }
 
-    const onPointerUp = () => {
+    const onPointerUp = (index) => {
         if (!dragging.current) return;
+        if ((current % total + total) % total === index) {
+            console.log('current selected');
+            navigate(`/poems/${encodeURIComponent(poemCards[index].title)}`);
+            return;
+        }
         if (moveEnough.current) {
             if (dir.current === 'left') {
                 next();
@@ -239,7 +257,7 @@ export default function Poems() {
         } else {
             // 视为点击：在松手时才执行选择/旋转，避免按下时布局变化打断 click 合成
             if (activeIndex.current != null) {
-                gotoCard(activeIndex.current);
+                gotoCard(activeIndex.current - cardOffset);
             }
         }
 
@@ -279,19 +297,19 @@ export default function Poems() {
                                 onMouseLeave={() => { handleDeselect(); setHovered(null); }}
                                 onPointerDown={(e) => onPointerDown(e, index)}
                                 onPointerMove={(e) => onPointerMove(e)}
-                                onPointerUp={() => onPointerUp()}
+                                onPointerUp={() => onPointerUp(index)}
                                 onPointerCancel={() => onPointerUp()}
                             >
                                 <Link to={`/poems/${encodeURIComponent(poem.title)}`} className="text-blue-500"
                                     onClick={(e) => {
-
                                         if (moveEnough.current) {
 
                                             e.preventDefault();
                                             moveEnough.current = false; // 重置移动状态
                                         }
-                                    }}>
-                                    <div className="img relative">
+                                    }
+                                    }>
+                                    <div className="img relative text-[#355c7d]">
                                         {poem.title}
                                         {hovered === index && (
                                             <div className="pointer-events-none absolute inset-0">
@@ -302,31 +320,58 @@ export default function Poems() {
                                 </Link>
                             </div>)
                     ))}
-
-
+                </div>
+                <div onClick={prev} className='absolute left-[25vw]'>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="#355c7d"
+                        className="w-10 h-10 text-white/80 hover:text-white cursor-pointer">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                </div>
+                <div onClick={next} className='absolute right-[25vw]'>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="#355c7d"
+                        className="w-10 h-10 text-white/80 hover:text-white cursor-pointer">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                 </div>
             </div>
 
-            <div className="relative z-100">
-                <button onClick={prev}>上一张</button>
-                <button onClick={next}>下一张</button>
 
-            </div>
-            <div className="relative max-w-4xl mx-auto p-4 mt-10 z-100">
+            <div className="relative max-w-4xl mx-auto p-4 mt-20 z-100">
                 {/* <h1 className="text-4xl font-bold mb-8">诗词列表</h1> */}
-                <ul className=" flex justify-center items-center space-x-4">
+                <ul className=" flex justify-center items-start space-x-4">
                     {poems && Object.keys(poems).length > 0 ? (
                         Object.keys(poems).map((x, idx) => (
-                            <li key={idx} className="w-[10px]">
-                                <Link to={`/poems/${encodeURIComponent(x)}`} className="text-blue-500 hover:no-underline" onMouseEnter={() => gotoCard(idx)}>
+                            <Link key={idx} className="flex items-center h-[75px] hover:h-[90px] py-2 bg-[url(assets/bamboo-surface.jpg)] 
+                            bg-cover hover:no-underline border-[#355c7d] border border-solid shadow rounded"
+                                to={`/poems/${encodeURIComponent(x)}`}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundImage = 'none';
+                                    e.currentTarget.style.backgroundColor = `rgb(${colors[idx % colors.length]})`; gotoCard(idx)
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundImage = 'url(assets/bamboo-surface.jpg)'
+                                }}
+                            >
+
+                                <li className=' text-center text-[#355c7d] bg-sky-500/20'
+                                    style={{
+                                        // backgroundColor: `rgb(${colors[idx % colors.length]})`,
+                                        writingMode: "vertical-rl", textOrientation: "upright"
+                                    }}>
+
                                     {x}
-                                </Link>
-                            </li>
+                                </li>
+                            </Link>
                         ))
                     ) : (
                         <li>暂无词集数据</li>
                     )}
                 </ul>
+                
+                
+                <Card text = {'Hello'} />
             </div>
         </>
     );

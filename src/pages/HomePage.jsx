@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react';
 import ciCollection from './poems.js';
 import Header from './Header.jsx';
+import Card from './Card.jsx';
 
 const poems = [
     {
@@ -23,14 +24,54 @@ export default function HomePage() {
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/bing-image')
-            .then(res => res.json())
-            .then(data => {
-                const urls = data.images.map(img => "https://bing.com" + img.url)
-                setImgUrl(urls);
-            })
-            .catch(err => console.error('壁纸加载失败', err));
-    }, []);
+  // 1) Try local cache first
+  const cached = localStorage.getItem('bingWallpapers');
+  const staleAt = localStorage.getItem('bingWallpapers:staleAt');
+  const now = Date.now();
+
+  if (cached && staleAt && now < Number(staleAt)) {
+    const urls = JSON.parse(cached);
+    setImgUrl(urls);
+    // Warm the browser cache in the background
+    urls.forEach(u => { const i = new Image(); i.src = u; });
+    return; // skip network fetch
+  }
+
+  // 2) Fetch fresh, then persist
+  fetch('http://localhost:3001/api/bing-image')
+    .then(res => res.json())
+    .then(data => {
+      const urls = data.images.map(img => "https://www.bing.com" + img.url);
+      setImgUrl(urls);
+
+      // Save for later sessions (e.g. valid for 24h)
+      localStorage.setItem('bingWallpapers', JSON.stringify(urls));
+      localStorage.setItem('bingWallpapers:staleAt', String(now + 24*60*60*1000));
+
+      // Warm the cache
+      urls.forEach(u => { const i = new Image(); i.src = u; });
+    })
+    .catch(err => {
+      // Fallback to local/public assets (these will be cacheable by the browser too)
+      const urls = ['/assets/img1.jpg', '/assets/img2.jpg', '/assets/img3.jpg'];
+      setImgUrl(urls);
+    window.__bingWallpapers = urls;
+      urls.forEach(u => { const i = new Image(); i.src = u; });
+      console.error('壁纸加载失败', err);
+    });
+}, []);
+
+    // useEffect(() => {
+    //     fetch('http://localhost:3001/api/bing-image')
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             const urls = data.images.map(img => "https://bing.com" + img.url)
+    //             setImgUrl(urls);
+    //         })
+    //         .catch(err => {
+    //             setImgUrl(['/assets/img1.jpg', '/assets/img2.jpg', '/assets/img3.jpg']);
+    //             console.error('壁纸加载失败', err)});
+    // }, []);
 
     const prevIndex = (index + poems.length - 1) % poems.length;
     const nextIndex = (index + 1) % poems.length;
@@ -42,18 +83,18 @@ export default function HomePage() {
             <div className="fixed inset-0 w-screen h-screen overflow-hidden z-[-1]">
                 {/* 左侧虚化背景 */}
                 <div
-                    className="absolute top-0 left-0 w-1/3 h-full bg-cover bg-center blur-sm opacity-30 transition-all duration-700"
-                    style={{ backgroundImage: `url(${imgUrl[prevIndex]})` }}
+                    className="absolute top-0 left-0 w-1/3 h-full bg-cover bg-center blur-sm opacity-30"
+                    style={imgUrl[prevIndex] ? { backgroundImage: `url(${imgUrl[prevIndex]})` } : undefined}
                 />
                 {/* 中间背景 */}
                 <div
-                    className="absolute top-0 left-1/3 w-1/3 h-full bg-cover bg-center opacity-30 transition-all duration-700"
-                    style={{ backgroundImage: `url(${imgUrl[index]})` }}
+                    className="absolute top-0 left-1/3 w-1/3 h-full bg-cover bg-center opacity-30"
+                    style={imgUrl[index] ? { backgroundImage: `url(${imgUrl[index]})` } : undefined}
                 />
                 {/* 右侧虚化背景 */}
                 <div
-                    className="absolute top-0 right-0 w-1/3 h-full bg-cover bg-center blur-sm opacity-30 transition-all duration-700"
-                    style={{ backgroundImage: `url(${imgUrl[nextIndex]})` }}
+                    className="absolute top-0 right-0 w-1/3 h-full bg-cover bg-center blur-sm opacity-30"
+                    style={imgUrl[nextIndex] ? { backgroundImage: `url(${imgUrl[nextIndex]})` } : undefined}
                 />
                 {/* 全屏暗色遮罩（可选） */}
                 <div className="absolute inset-0 bg-black/30" />
@@ -75,7 +116,7 @@ export default function HomePage() {
 
                     <section className="mb-12">
                         <article key={index} className="relative bg-[#fefcf7] border border-gray-300 shadow-inner rounded-xl p-6 md:p-8 transition-opacity duration-700 ease-in-out"
-                            style={{ backgroundImage: `url(${imgUrl[index] || 'none'})` }}
+                            style={imgUrl[index] ? { backgroundImage: `url(${imgUrl[index]})` } : undefined}
                         >
                             {/* 指示箭头 */}
                             <div onClick={() => setIndex(prevIndex)} className='absolute left-4 top-1/2 -translate-y-1/2 z-20'>
@@ -117,8 +158,9 @@ export default function HomePage() {
                             {
                                 Object.keys(ciCollection).map((collection, idx) => (
                                     idx < 9 ?
-                                    <Link key={idx} to={`/poems/${collection}`} className="text-center bg-white text-gray-800 shadow rounded px-4 py-3 hover:bg-gray-100 transition">
-                                        {collection}
+                                    <Link key={idx} to={`/poems/${collection}`}>
+                                        
+                                        <Card text={collection} width={'250px'} height={'55px'} />
                                     </Link>
                                     : null
                                 ))
