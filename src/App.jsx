@@ -7,7 +7,7 @@ import PoemPage from './pages/PoemPage'
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route index element={<HomePage />} />
       <Route path="/tools" element={<CiAssist />} />
       <Route path="/poems" element={<Poems />} />
       <Route path="/poems/:title" element={<PoemPage />} />

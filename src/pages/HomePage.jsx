@@ -19,9 +19,12 @@ const poems = [
     }
 ];
 
+
 export default function HomePage() {
     const [imgUrl, setImgUrl] = useState([]);
     const [index, setIndex] = useState(0);
+    const base = import.meta.env.BASE_URL;
+    console.log(base);
 
     useEffect(() => {
         // 1) Try local cache first
@@ -53,7 +56,8 @@ export default function HomePage() {
             })
             .catch(err => {
                 // Fallback to local/public assets (these will be cacheable by the browser too)
-                const urls = ['/assets/img1.jpg', '/assets/img2.jpg', '/assets/img3.jpg'];
+                const urls = ['img1.jpg', 'img2.jpg', 'img3.jpg'].map(name => `${base}assets/${name}`);
+
                 setImgUrl(urls);
                 localStorage.setItem('bingWallpapers', JSON.stringify(urls));
                 localStorage.setItem('bingWallpapers:staleAt', String(now + 24 * 60 * 60 * 1000));
