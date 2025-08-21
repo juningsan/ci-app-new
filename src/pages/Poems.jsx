@@ -343,8 +343,9 @@ export default function Poems() {
                 <ul className=" flex justify-center items-start space-x-4">
                     {poems && Object.keys(poems).length > 0 ? (
                         Object.keys(poems).map((x, idx) => (
-                            <Link key={idx} className="flex items-center h-[75px] hover:h-[90px] py-2 bg-[url(assets/bamboo-surface.jpg)] 
+                            <Link key={idx} className="flex items-center h-[75px] hover:h-[90px] py-2 
                             bg-cover hover:no-underline border-[#355c7d] border border-solid shadow rounded"
+                                style={{backgroundImage: 'url(assets/bamboo-surface.jpg)'}}
                                 to={`/poems/${encodeURIComponent(x)}`}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundImage = 'none';
