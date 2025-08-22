@@ -321,14 +321,14 @@ export default function Poems() {
                             </div>)
                     ))}
                 </div>
-                <div onClick={prev} className='absolute left-[25vw]'>
+                <div onClick={prev} className='absolute hidden md:block left-[25vw]'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="#355c7d"
                         className="w-10 h-10 text-white/80 hover:text-white cursor-pointer">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                 </div>
-                <div onClick={next} className='absolute right-[25vw]'>
+                <div onClick={next} className='absolute hidden md:block right-[25vw]'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="#355c7d"
                         className="w-10 h-10 text-white/80 hover:text-white cursor-pointer">
@@ -338,12 +338,11 @@ export default function Poems() {
             </div>
 
 
-            <div className="relative max-w-4xl mx-auto p-4 mt-20 z-100">
-                {/* <h1 className="text-4xl font-bold mb-8">诗词列表</h1> */}
-                <ul className=" flex justify-center items-start space-x-4">
+            <div className="relative max-w-[50vw] md-max-w-4xl mx-auto p-4 mt-10 md:mt-20 z-100">
+                <ul className=" flex justify-center items-start space-x-1 md-space-x-4">
                     {poems && Object.keys(poems).length > 0 ? (
                         Object.keys(poems).map((x, idx) => (
-                            <Link key={idx} className="flex items-center h-[75px] hover:h-[90px] py-2 
+                            <Link key={idx} className="flex items-center md-h-[75px] md-hover:h-[90px] py-2 
                             bg-cover hover:no-underline border-[#355c7d] border border-solid shadow rounded"
                                 style={{backgroundImage: 'url(assets/bamboo-surface.jpg)'}}
                                 to={`/poems/${encodeURIComponent(x)}`}

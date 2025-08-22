@@ -102,37 +102,37 @@ export default function HomePage() {
                     className="absolute top-0 right-0 w-1/3 h-full bg-cover bg-center blur-sm opacity-30"
                     style={imgUrl[nextIndex] ? { backgroundImage: `url(${imgUrl[nextIndex]})` } : undefined}
                 />
-                {/* 全屏暗色遮罩（可选） */}
+                {/* 全屏暗色遮罩 */}
                 <div className="absolute inset-0 bg-black/30" />
             </div>
             <div onClick={() => setIndex(prevIndex)} className="fixed left-0 top-0 w-1/5 h-full z-0 cursor-pointer" />
             <div onClick={() => setIndex(nextIndex)} className="fixed right-0 top-0 w-1/5 h-full z-0 cursor-pointer" />
 
             {/* 主页面 */}
-            <div className="flex items-center justify-center min-h-screen">
-                <main className="relative z-100 overflow-hidden min-h-[80vh] max-w-[60vw] w-full bg-[rgba(253,253,245,0.5)] backdrop-blur-md shadow-xl rounded-xl px-6 py-10">
+            <div className="flex min-h-[95vh]  items-center justify-center">
+                <main className="relative z-100 overflow-hidden md-max-w-[60vw] bg-[rgba(253,253,245,0.5)] backdrop-blur-md shadow-xl md-rounded-xl px-6 py-6 md-py-10">
 
                     {/* 网站标题区 */}
-                    <header className="text-center mb-12">
-                        <h1 className="text-5xl font-bold mb-2">宋词札记</h1>
+                    <header className="text-center mt-5 mb-5 md-mb-12 ">
+                        <h1 className="text-3xl md-text-5xl font-bold mb-2">宋词札记</h1>
                         <p className="text-base text-gray-500 tracking-wide">记忆与感知的流动</p>
                     </header>
 
                     {/* 随机词展示区 */}
 
-                    <section className="mb-12">
+                    <section className="mb-5 md-mb-12">
                         <article key={index} className="relative bg-[#fefcf7] border border-gray-300 shadow-inner rounded-xl p-6 md:p-8 transition-opacity duration-700 ease-in-out"
                             style={imgUrl[index] ? { backgroundImage: `url(${imgUrl[index]})` } : undefined}
                         >
                             {/* 指示箭头 */}
-                            <div onClick={() => setIndex(prevIndex)} className='absolute left-4 top-1/2 -translate-y-1/2 z-20'>
+                            <div onClick={() => setIndex(prevIndex)} className='absolute -left-2 md-left-4 top-1/2 -translate-y-1/2 z-20'>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor"
                                     className="w-10 h-10 text-white/80 hover:text-white cursor-pointer">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                 </svg>
                             </div>
-                            <div onClick={() => setIndex(nextIndex)} className='absolute right-4 top-1/2 -translate-y-1/2 z-20'>
+                            <div onClick={() => setIndex(nextIndex)} className='absolute -right-2 md-right-4 top-1/2 -translate-y-1/2 z-20'>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor"
                                     className="w-10 h-10 text-white/80 hover:text-white cursor-pointer">
@@ -143,8 +143,8 @@ export default function HomePage() {
                             {/* 词内容 */}
                             <div className="absolute inset-0 bg-black/40 z-0 rounded-xl" />
                             <div key={index} className="relative flex items-center justify-center flex-col z-90 overflow-hidden transition-all duration-700 ease-out transform opacity-0 translate-y-4 animate-fadeIn">
-                                <h3 className="text-xl font-bold mb-4 text-gray-200/50 text-center">{poems[index].title}</h3>
-                                <p className="whitespace-pre-line text-lg leading-loose text-gray-200/50 text-center">
+                                <h3 className="text-sm md-text-xl md-font-bold mb-4 text-gray-200/50 text-center">{poems[index].title}</h3>
+                                <p className="whitespace-pre-line leading-loose text-gray-200/50 text-center">
                                     {poems[index].content}
                                 </p>
                             </div>
@@ -164,9 +164,12 @@ export default function HomePage() {
                             {
                                 Object.keys(ciCollection).map((collection, idx) => (
                                     idx < 9 ?
-                                        <Link key={idx} to={`/poems/${collection}`} className='mx-auto'>
+                                        <Link key={idx} to={`/poems/${collection}`} className='w-full text-center mx-auto'>
 
-                                            <Card text={collection} width={'250px'} height={'55px'} />
+                                            <div className="block md:hidden  px-2 py-1 text-[#213547] bg-[#e5e9f0] hover:bg-[#d8dee9] hover:text-gray-600 cursor-pointer rounded shadow">
+                                                {collection}
+                                            </div>
+                                            <Card text={collection} width={'250px'} height={'55px'} className="hidden md:block" />
                                         </Link>
                                         : null
                                 ))
@@ -188,19 +191,19 @@ export default function HomePage() {
           </section> */}
 
                     {/* 填词助手入口 */}
-                    <section className="mb-16 mb-10 text-center z-100">
+                    <section className="md-mb-10 text-center z-100">
                         <h2 className="text-xl font-semibold mb-2">✍️ 想试试自己填一首词？</h2>
                         <Link to="/tools" className="inline-block mt-2 px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition">
                             打开填词助手
                         </Link>
                     </section>
                 </main>
-
+            </div>
                 {/* 页脚 */}
-                <footer className="fixed z-200 bottom-4 text-center text-sm text-gray-500  pt-6">
+                <footer className=" z-200 text-center text-sm text-gray-500">
                     © 2025 Eliot Hongtuo · 以词为舟，泛古今之思。
                 </footer>
-            </div>
+            
         </>
     )
 }

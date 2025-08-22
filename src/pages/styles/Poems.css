@@ -1,9 +1,7 @@
 /* From Uiverse.io by ilkhoeri */
 .wrapper {
-  /* width: 100%;
-  height: 100%; */
   width: 100vw;
-  height: 35vh;
+  height: 28vh;
   top: 6vh;
   position: relative;
   text-align: center;
@@ -14,8 +12,8 @@
 }
 
 .inner {
-  --w: 100px;
-  --h: 150px;
+  --w: 70px;
+  --h: 105px;
   --translateZ: calc((var(--w) + var(--h)) + 0px);
   --rotateX: -15deg;
   --perspective: 1000px;
@@ -32,8 +30,17 @@
   animation: rotating 30s linear infinite;
 }
 
-
-
+@media screen and (width >= 1000px) {
+  .wrapper {
+    height: 35vh;
+  }
+  .inner {
+    --w: 100px;
+    --h: 150px;
+    --perspective: 1000px;
+  }
+  
+}
 
 @keyframes rotating {
   from {

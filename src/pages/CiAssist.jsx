@@ -240,7 +240,7 @@ export default function CiAssist() {
                     )
                 }
             </div>
-            <footer className="w-screen fixed bottom-7 left-1/2 transform -translate-x-1/2 text-center text-sm text-gray-500 pt-6">
+            <footer className="w-screen absolute bottom-7 left-1/2 transform -translate-x-1/2 text-center text-sm text-gray-500 pt-6">
                 © 2025 Eliot Hongtuo · 以词为舟，泛古今
             </footer>
         </div>
