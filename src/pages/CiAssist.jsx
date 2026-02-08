@@ -135,11 +135,11 @@ export default function CiAssist() {
             const containsRef = yunSet.some(obj => obj.word.includes(referenceYunZi));
             const containsWord = yunSet.some(obj => obj.word.includes(word));
             if (containsRef && containsWord) {
-                return true; // 两个字都在同一个韵部中 ✅ 押韵
+                return true; // 两个字都在同一个韵部中 押韵
             }
         }
 
-        return false; // 没找到同韵 ❌
+        return false; // 没找到同韵
     };
 
     const checkPz = (word, pz) => {

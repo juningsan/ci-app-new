@@ -67,18 +67,6 @@ export default function HomePage() {
             });
     }, []);
 
-    // useEffect(() => {
-    //     fetch('http://localhost:3001/api/bing-image')
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             const urls = data.images.map(img => "https://bing.com" + img.url)
-    //             setImgUrl(urls);
-    //         })
-    //         .catch(err => {
-    //             setImgUrl(['/assets/img1.jpg', '/assets/img2.jpg', '/assets/img3.jpg']);
-    //             console.error('壁纸加载失败', err)});
-    // }, []);
-
     const prevIndex = (index + poems.length - 1) % poems.length;
     const nextIndex = (index + 1) % poems.length;
 
