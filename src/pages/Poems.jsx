@@ -281,8 +281,7 @@ export default function Poems() {
 
     return (
         <>
-            <Header />
-            {/* From Uiverse.io by ilkhoeri */}
+            <Header />        
             <div className="wrapper" style={{}}>
                 <div className="inner" style={{ "--quantity": total, transform: `perspective(1000px) rotateX(-15deg) rotateY(${-current * 360 / total}deg)` }}>
                     {/* 生成卡片 */}
@@ -338,7 +337,7 @@ export default function Poems() {
             </div>
 
 
-            <div className="relative max-w-[50vw] md-max-w-4xl mx-auto p-4 mt-10 md:mt-20 z-100">
+            {/* <div className="relative max-w-[50vw] md-max-w-4xl mx-auto p-4 mt-10 md:mt-20 z-100">
                 <ul className=" flex justify-center items-start space-x-1 md-space-x-4">
                     {poems && Object.keys(poems).length > 0 ? (
                         Object.keys(poems).map((x, idx) => (
@@ -369,7 +368,19 @@ export default function Poems() {
                         <li>暂无词集数据</li>
                     )}
                 </ul>
-            </div>
+            </div> */}
+
+            <section className="relative max-w-[50vw] md-max-w-4xl border border-[#355c7d]  mx-auto p-4 mt-10 md:mt-20 z-100">
+                {poems && Object.keys(poems).length > 0 ? (
+                    <header>
+                        {Object.keys(poems)[Math.abs(current % Object.keys(poems).length)]}
+                    </header>
+                ) : (
+                        <p>暂无词集数据</p>
+                    )}
+            </section>
+
+
         </>
     );
 }
