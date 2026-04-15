@@ -16,7 +16,6 @@ export default function TextFall({ color, content }) {
         });
     }, [content]);
     return (
-        // <!-- From Uiverse.io by whoisyourdeadie --> 
 
         <div className="matrix-container" style={{ 'background': color }}>
             <div className="matrix-pattern">

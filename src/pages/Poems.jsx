@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import poems from "./poems.js"
 import Header from "./Header.jsx"
 import TextFall from "./TextFall.jsx"
+import PoemStats from "./PoemStats.jsx";
 import Card from "./Card.jsx"
 import "./styles/Poems.css"
 import "./styles/TextFall.css";
@@ -26,16 +27,46 @@ export default function Poems() {
     ];
     const [poemCards, setPoemCards] = useState(poems && Object.keys(poems).length > 0 ? Object.keys(poems).map((key, index) => ({
         title: key,
-        content: poems[key],
+        content: poems[key]?.content ?? "",
+        time: poems[key]?.time ?? "",
+        description: poems[key]?.description ?? "",
         color: colors[index % colors.length]
     })) : []);
+
     const [cardOffset, setCardOffset] = useState(0);
     const navigate = useNavigate();
+    const descriptionRef = useRef(null);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const [isDescriptionOverflowing, setIsDescriptionOverflowing] = useState(false);
 
     const [hovered, setHovered] = useState(null);
-    const [current, setCurrent] = useState(null); // 当前卡片索引
+    const [current, setCurrent] = useState(0); // 当前卡片索引
     const prevCurrent = useRef(current);
     const total = poemCards.length > 10 ? poemCards.length : 10; // 卡片总数
+    const currentCard = poemCards[(current % poemCards.length + poemCards.length) % poemCards.length];
+
+    useEffect(() => {
+        setIsDescriptionExpanded(false);
+    }, [currentCard?.title]);
+
+    useEffect(() => {
+        const element = descriptionRef.current;
+        if (!element) return;
+
+        const frame = requestAnimationFrame(() => {
+            const computedStyle = window.getComputedStyle(element);
+            const lineHeight = parseFloat(computedStyle.lineHeight);
+            if (Number.isNaN(lineHeight)) {
+                setIsDescriptionOverflowing(false);
+                return;
+            }
+
+            setIsDescriptionOverflowing(element.scrollHeight > lineHeight * 3 + 1);
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, [currentCard?.description]);
+
     // 切换到下一张卡片
     const next = () => {
         const inner = document.querySelector('.inner');
@@ -52,12 +83,10 @@ export default function Poems() {
     }
     // 切换到上一个卡片
     const prev = () => {
+        console.log('currentCard', currentCard);
         const inner = document.querySelector('.inner');
         if (inner) {
             inner.style.animation = 'none'; // 移除动画
-            // 触发重绘
-            //   void inner.offsetWidth;
-            //   inner.style.animation = ''; // 恢复动画
         }
         setCurrent((prev) => {
             if (prev === null) return 0;
@@ -176,7 +205,6 @@ export default function Poems() {
             //   void inner.offsetWidth;
             //   inner.style.animation = ''; // 恢复动画
         }
-        console.log('index', index, 'cardOffset', cardOffset);
         setCurrent((prev) => {
             let idx = index + cardOffset;
             let offset = idx - prev;
@@ -281,7 +309,7 @@ export default function Poems() {
 
     return (
         <>
-            <Header />        
+            <Header />
             <div className="wrapper" style={{}}>
                 <div className="inner" style={{ "--quantity": total, transform: `perspective(1000px) rotateX(-15deg) rotateY(${-current * 360 / total}deg)` }}>
                     {/* 生成卡片 */}
@@ -336,50 +364,56 @@ export default function Poems() {
                 </div>
             </div>
 
+            <div className="mt-[28px] mx-auto w-[50vw] h-[50px] bg-[#355c7d] [clip-path:polygon(35%_0%,65%_0%,100%_100%,0%_100%)]" style={{ "background": `rgba(${currentCard.color},0.3)` }}>
+            </div>
 
-            {/* <div className="relative max-w-[50vw] md-max-w-4xl mx-auto p-4 mt-10 md:mt-20 z-100">
-                <ul className=" flex justify-center items-start space-x-1 md-space-x-4">
-                    {poems && Object.keys(poems).length > 0 ? (
-                        Object.keys(poems).map((x, idx) => (
-                            <Link key={idx} className="flex items-center md-h-[75px] md-hover:h-[90px] py-2 
-                            bg-cover hover:no-underline border-[#355c7d] border border-solid shadow rounded"
-                                style={{backgroundImage: 'url(assets/bamboo-surface.jpg)'}}
-                                to={`/poems/${encodeURIComponent(x)}`}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundImage = 'none';
-                                    e.currentTarget.style.backgroundColor = `rgb(${colors[idx % colors.length]})`; gotoCard(idx)
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundImage = 'url(assets/bamboo-surface.jpg)'
+            {
+                poemCards && poemCards.length > 0 ? (
+                    <div className="relative w-[90vw] bg-gray-100 md:w-[50vw] mx-auto mb-10 p-4 text-[#355c7d]" style={{ "backgroundColor": `rgba(${currentCard.color},0.8)`, "borderRadius": "8px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
+                        <header>
+                            <div className="text-center">
+                            <Link to={`/poems/${currentCard.title}`} className="text-xl inline-flex items-center gap-1 text-inherit no-underline text-2xl font-semibold">{currentCard.title}
+                                <svg className="w-4 h-4 mt-[2px]" fill="none" stroke="currentColor" strokeWidth={2}
+                                    viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </Link>
+                            </div>
+                            <p className="text-center text-sm"><span>创作时间</span> {currentCard.time}</p>
+                            <hr className="my-4" />
+                            <h2 className="text-center">简介</h2>
+                            <p
+                                ref={descriptionRef}
+                                className="overflow-hidden"
+                                style={isDescriptionExpanded ? undefined : {
+                                    display: "-webkit-box",
+                                    WebkitBoxOrient: "vertical",
+                                    WebkitLineClamp: 3,
                                 }}
                             >
-
-                                <li className=' text-center text-[#355c7d] bg-sky-500/20'
-                                    style={{
-                                        // backgroundColor: `rgb(${colors[idx % colors.length]})`,
-                                        writingMode: "vertical-rl", textOrientation: "upright"
-                                    }}>
-
-                                    {x}
-                                </li>
-                            </Link>
-                        ))
-                    ) : (
-                        <li>暂无词集数据</li>
-                    )}
-                </ul>
-            </div> */}
-
-            <section className="relative max-w-[50vw] md-max-w-4xl border border-[#355c7d]  mx-auto p-4 mt-10 md:mt-20 z-100">
-                {poems && Object.keys(poems).length > 0 ? (
-                    <header>
-                        {Object.keys(poems)[Math.abs(current % Object.keys(poems).length)]}
-                    </header>
+                                {currentCard.description}
+                            </p>
+                            <div className="flex justify-end">
+                            {currentCard.description && isDescriptionOverflowing && (
+                                <button
+                                    type="button"
+                                    className="bg-[#355c7d] mt-2 text-sm"
+                                    onClick={() => setIsDescriptionExpanded((prev) => !prev)}
+                                >
+                                    {isDescriptionExpanded ? "收起" : "展开"}
+                                </button>
+                            )}
+                            </div>
+                        </header>
+                        <hr className="my-4" />
+                        <article className="mb-4">
+                            <h2 className="text-center">作品构成</h2>
+                            <PoemStats currentCard={currentCard} />
+                        </article>
+                    </div>
                 ) : (
-                        <p>暂无词集数据</p>
-                    )}
-            </section>
-
+                    <p>暂无词集数据</p>
+                )}
 
         </>
     );

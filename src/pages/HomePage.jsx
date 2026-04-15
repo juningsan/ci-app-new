@@ -24,7 +24,6 @@ export default function HomePage() {
     const [imgUrl, setImgUrl] = useState([]);
     const [index, setIndex] = useState(0);
     const base = import.meta.env.BASE_URL;
-    console.log(base);
 
     useEffect(() => {
         // 1) Try local cache first

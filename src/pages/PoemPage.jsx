@@ -4,7 +4,7 @@ import Header from "./Header";
 
 export default function PoemPage() {
   const { title } = useParams();
-  const poemData = poems[title];
+  const poemData = poems[title].content;
   const paragraphs = poemData ? poemData.split('\n\n') : [];
 
   if (!poemData) return <div>未找到对应词集：{title}</div>
