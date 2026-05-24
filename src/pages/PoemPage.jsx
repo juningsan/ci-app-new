@@ -1,13 +1,15 @@
 import { useParams } from 'react-router-dom'
 import poems from './poems'
 import Header from "./Header";  
+import { useLanguage } from '../language.js';
 
 export default function PoemPage() {
+  const { t } = useLanguage();
   const { title } = useParams();
-  const poemData = poems[title].content;
+  const poemData = poems[title]?.content;
   const paragraphs = poemData ? poemData.split('\n\n') : [];
 
-  if (!poemData) return <div>未找到对应词集：{title}</div>
+  if (!poemData) return <div>{t('poemNotFound')}{title}</div>
 
   return (
     <>

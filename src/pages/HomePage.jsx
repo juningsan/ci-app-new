@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react';
 import ciCollection from './poems.js';
-import Header from './Header.jsx';
 import Card from './Card.jsx';
+import { useLanguage } from '../language.js';
 
 const poems = [
     {
@@ -21,6 +21,7 @@ const poems = [
 
 
 export default function HomePage() {
+    const { language, setLanguage, t } = useLanguage();
     const [imgUrl, setImgUrl] = useState([]);
     const [index, setIndex] = useState(0);
     const base = import.meta.env.BASE_URL;
@@ -64,14 +65,13 @@ export default function HomePage() {
                 urls.forEach(u => { const i = new Image(); i.src = u; });
                 console.error('壁纸加载失败', err);
             });
-    }, []);
+    }, [base]);
 
     const prevIndex = (index + poems.length - 1) % poems.length;
     const nextIndex = (index + 1) % poems.length;
 
     return (
         <>
-            {/* <Header /> */}
             {/* 背景图 */}
             <div className="fixed inset-0 w-screen h-screen overflow-hidden z-[-1]">
                 {/* 左侧虚化背景 */}
@@ -98,11 +98,29 @@ export default function HomePage() {
             {/* 主页面 */}
             <div className="flex min-h-[95vh]  items-center justify-center">
                 <main className="relative z-100 overflow-hidden md-max-w-[60vw] bg-[rgba(253,253,245,0.5)] backdrop-blur-md shadow-xl md-rounded-xl px-6 py-6 md-py-10">
+                    <div className="absolute right-4 top-4 z-100 inline-flex overflow-hidden rounded border border-gray-300 bg-white/60 text-sm shadow-sm">
+                        <button
+                            type="button"
+                            className={`px-3 py-1 rounded-none border-0 ${language === 'zh' ? 'bg-gray-800 text-white' : 'bg-transparent text-gray-700 hover:bg-white/70'}`}
+                            onClick={() => setLanguage('zh')}
+                            aria-pressed={language === 'zh'}
+                        >
+                            {t('languageChinese')}
+                        </button>
+                        <button
+                            type="button"
+                            className={`px-3 py-1 rounded-none border-0 ${language === 'ja' ? 'bg-gray-800 text-white' : 'bg-transparent text-gray-700 hover:bg-white/70'}`}
+                            onClick={() => setLanguage('ja')}
+                            aria-pressed={language === 'ja'}
+                        >
+                            {t('languageJapanese')}
+                        </button>
+                    </div>
 
                     {/* 网站标题区 */}
                     <header className="text-center mt-5 mb-5 md-mb-12 ">
-                        <h1 className="text-3xl md-text-5xl font-bold mb-2">宋词札记</h1>
-                        <p className="text-base text-gray-500 tracking-wide">记忆与感知的流动</p>
+                        <h1 className="text-3xl md-text-5xl font-bold mb-2">{t('siteTitle')}</h1>
+                        <p className="text-base text-gray-500 tracking-wide">{t('siteSubtitle')}</p>
                     </header>
 
                     {/* 随机词展示区 */}
@@ -140,7 +158,7 @@ export default function HomePage() {
 
                     {/* 分类导航区 */}
                     <section className="mb-12">
-                        <Link to='/poems' className="inline-flex items-center gap-1 text-inherit no-underline text-2xl font-semibold">词集索引
+                        <Link to='/poems' className="inline-flex items-center gap-1 text-inherit no-underline text-2xl font-semibold">{t('navPoems')}
                             <svg className="w-4 h-4 mt-[2px]" fill="none" stroke="currentColor" strokeWidth={2}
                                 viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -179,16 +197,16 @@ export default function HomePage() {
 
                     {/* 填词助手入口 */}
                     <section className="md-mb-10 text-center z-100">
-                        <h2 className="text-xl font-semibold mb-2">✍️ 想试试自己填一首词？</h2>
+                        <h2 className="text-xl font-semibold mb-2">✍️ {t('homeTryWriting')}</h2>
                         <Link to="/tools" className="inline-block mt-2 px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition">
-                            打开填词助手
+                            {t('homeOpenAssistant')}
                         </Link>
                     </section>
                 </main>
             </div>
                 {/* 页脚 */}
                 <footer className=" z-200 text-center text-sm text-gray-500">
-                    © 2025 Eliot Hongtuo · 以词为舟，泛古今之思。
+                    {t('footerFull')}
                 </footer>
             
         </>

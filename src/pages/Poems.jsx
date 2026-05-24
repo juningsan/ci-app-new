@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,10 +9,12 @@ import PoemStats from "./PoemStats.jsx";
 import Card from "./Card.jsx"
 import "./styles/Poems.css"
 import "./styles/TextFall.css";
+import { useLanguage } from "../language.js";
 
 
 
 export default function Poems() {
+    const { t } = useLanguage();
     const colors = [
         "142, 249, 252",
         "142, 252, 204",
@@ -195,7 +197,7 @@ export default function Poems() {
                 }
             }
         }
-    }, [current, cardOffset, poemCards]);
+    }, [current, cardOffset, poemCards, total]);
 
     const gotoCard = (index) => {
         const inner = document.querySelector('.inner');
@@ -364,7 +366,7 @@ export default function Poems() {
                 </div>
             </div>
 
-            <div className="mt-[28px] mx-auto w-[50vw] h-[50px] bg-[#355c7d] [clip-path:polygon(35%_0%,65%_0%,100%_100%,0%_100%)]" style={{ "background": `rgba(${currentCard.color},0.3)` }}>
+            <div className="mt-[10px] md:mt-[28px] mx-auto w-[90vw] md:w-[50vw] h-[50px] bg-[#355c7d] [clip-path:polygon(35%_0%,65%_0%,100%_100%,0%_100%)]" style={{ "background": `rgba(${currentCard.color},0.3)` }}>
             </div>
 
             {
@@ -372,16 +374,16 @@ export default function Poems() {
                     <div className="relative w-[90vw] bg-gray-100 md:w-[50vw] mx-auto mb-10 p-4 text-[#355c7d]" style={{ "backgroundColor": `rgba(${currentCard.color},0.8)`, "borderRadius": "8px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
                         <header>
                             <div className="text-center">
-                            <Link to={`/poems/${currentCard.title}`} className="text-xl inline-flex items-center gap-1 text-inherit no-underline text-2xl font-semibold">{currentCard.title}
+                            <Link to={`/poems/${currentCard.title}`} className="inline-flex items-center gap-1 text-inherit no-underline text-2xl font-semibold">{currentCard.title}
                                 <svg className="w-4 h-4 mt-[2px]" fill="none" stroke="currentColor" strokeWidth={2}
                                     viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>
                             </Link>
                             </div>
-                            <p className="text-center text-sm"><span>创作时间</span> {currentCard.time}</p>
+                            <p className="text-center text-sm"><span>{t('createdAt')}</span> {currentCard.time}</p>
                             <hr className="my-4" />
-                            <h2 className="text-center">简介</h2>
+                            <h2 className="text-center">{t('description')}</h2>
                             <p
                                 ref={descriptionRef}
                                 className="overflow-hidden"
@@ -400,19 +402,19 @@ export default function Poems() {
                                     className="bg-[#355c7d] mt-2 text-sm"
                                     onClick={() => setIsDescriptionExpanded((prev) => !prev)}
                                 >
-                                    {isDescriptionExpanded ? "收起" : "展开"}
+                                    {isDescriptionExpanded ? t('collapse') : t('expand')}
                                 </button>
                             )}
                             </div>
                         </header>
                         <hr className="my-4" />
                         <article className="mb-4">
-                            <h2 className="text-center">作品构成</h2>
+                            <h2 className="text-center">{t('composition')}</h2>
                             <PoemStats currentCard={currentCard} />
                         </article>
                     </div>
                 ) : (
-                    <p>暂无词集数据</p>
+                    <p>{t('noPoemCollection')}</p>
                 )}
 
         </>

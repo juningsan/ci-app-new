@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { Link } from 'react-router-dom'
 
 import Header from "./Header";  
 import Contentlist from "./contentlist";
 import yunlist from "./pingshui";
+import { useLanguage } from "../language.js";
 
 
-function CiPaiSelector({ ciPais, currentCiPai, setCurrentCiPai }) {
+function CiPaiSelector({ ciPais, setCurrentCiPai }) {
     function onSelect(val) {
         setCurrentCiPai(val);
     };
@@ -26,13 +26,13 @@ function CiPaiSelector({ ciPais, currentCiPai, setCurrentCiPai }) {
 }
 
 export default function CiAssist() {
+    const { t } = useLanguage();
     const ciPais = ['浣溪沙', '暗香', '菩萨蛮', '蝶恋花', '如梦令', '忆江南', '清平乐', '虞美人', '临江仙', '西江月', '水调歌头'];
     const [currentCiPai, setCurrentCiPai] = useState('浣溪沙');
     const currentContent = Contentlist[currentCiPai] || '';
     const [inputs, setInputs] = useState({});
     const [pingzeErrors, setPingzeErrors] = useState({});
     const [yunFlags, setYunFlags] = useState({});
-    const [yunShu, setYunShu] = useState(1);
     const [yunZi, setYunZi] = useState([]);
 
     const handleInputChange = (index, event) => {
@@ -172,14 +172,14 @@ export default function CiAssist() {
 
     return (
         <>
-        <Header />
+            <Header />
         <div className="max-w-4xl mx-auto">
             <div className="pt-20 flex justify-center font-noto text-xl">
-                选择词牌以开始
+                {t('startByChoosingCiPai')}
             </div>
-            <CiPaiSelector ciPais={ciPais} currentCiPai={currentCiPai} setCurrentCiPai={setCurrentCiPai} />
+            <CiPaiSelector ciPais={ciPais} setCurrentCiPai={setCurrentCiPai} />
             <div className="px-4 py-8">
-                <h2 className="text-2xl font-semibold mb-4">当前词牌：{currentCiPai}</h2>
+                <h2 className="text-2xl font-semibold mb-4">{t('currentCiPai')}{currentCiPai}</h2>
                 {
                     typeof currentContent === 'string' && currentContent.trim() !== '' ? (
                         <div className="bg-white shadow p-6 rounded leading-loose">
@@ -236,12 +236,12 @@ export default function CiAssist() {
                             })}
                         </div>
                     ) : (
-                        <p className="text-gray-500">暂无内容</p>
+                        <p className="text-gray-500">{t('noContent')}</p>
                     )
                 }
             </div>
             <footer className="w-screen absolute bottom-7 left-1/2 transform -translate-x-1/2 text-center text-sm text-gray-500 pt-6">
-                © 2025 Eliot Hongtuo · 以词为舟，泛古今
+                {t('footerShort')}
             </footer>
         </div>
         </>
