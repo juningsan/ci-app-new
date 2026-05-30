@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 
-import Header from "./Header";  
+import Header from "./Header";
 import Contentlist from "./contentlist";
 import yunlist from "./pingshui";
 import { useLanguage } from "../language.js";
@@ -16,11 +16,11 @@ function CiPaiSelector({ ciPais, setCurrentCiPai }) {
         <ul className="grid grid-cols-4 gap-4">
             {ciPais.map((val, key) => (
                 <li key={key} className="text-center bg-white shadow rounded px-4 py-3 hover:bg-gray-100 text-gray-800 hover:text-gray-600 cursor-pointer" onClick={() => onSelect(val)}>
-                        {val}                  
+                        {val}
                 </li>
             ))}
-        </ul>   
-        </div>      
+        </ul>
+        </div>
     )
 
 }
@@ -164,16 +164,16 @@ export default function CiAssist() {
                     count++;
                     }
             }
-            if(count === 5) output = true; 
+            if(count === 5) output = true;
         }
-    
+
         return output;
     };
 
     return (
         <>
             <Header />
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto min-h-screen flex flex-col">
             <div className="pt-20 flex justify-center font-noto text-xl">
                 {t('startByChoosingCiPai')}
             </div>
@@ -240,7 +240,7 @@ export default function CiAssist() {
                     )
                 }
             </div>
-            <footer className="w-screen absolute bottom-7 left-1/2 transform -translate-x-1/2 text-center text-sm text-gray-500 pt-6">
+            <footer className="w-full text-center text-sm text-gray-500 pt-6 my-2">
                 {t('footerShort')}
             </footer>
         </div>

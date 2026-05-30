@@ -205,7 +205,7 @@ export default function HomePage() {
                 </main>
             </div>
                 {/* 页脚 */}
-                <footer className=" z-200 text-center text-sm text-gray-500">
+                <footer className="z-200 my-2 text-center text-sm text-gray-500">
                     {t('footerFull')}
                 </footer>
             
